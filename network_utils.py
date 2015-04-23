@@ -8,25 +8,8 @@ import numpy as np
 from pylab import hist
 import pylab as pl
 
-def readNetworkData(path):
-    G = nx.Graph()
-    nodes = set()
-
-    i = 0
-    for line in open(path):
-        i += 1
-        if i <= 1:
-            continue
-        l = line.split(';')
-        G.add_edge(l[0],l[1],length=int(l[2]))
-        nodes.add(l[0])
-        nodes.add(l[1])
-        
-    print("Created graph with " + str(i-1) + " edges and " + str(len(nodes)) + " nodes.")
-    return G
-
-def drawNetwork(graph,i):
-    pl.figure(i)
+def drawNetwork(graph,k):
+    pl.figure(k)
     pl.subplot(211)
     pos = nx.spring_layout(graph) # positions for all nodes
 
@@ -44,7 +27,7 @@ def drawNetwork(graph,i):
     plt.draw() # display
     return
 
-def printStats(graph,i):
+def printStats(graph,k):
     
     if (nx.is_connected(graph)):
         d = nx.diameter(graph)
@@ -60,7 +43,8 @@ def printStats(graph,i):
         for g in nx.connected_component_subgraphs(graph):
             i += 1
             d += nx.diameter(g)
-            p += nx.average_shortest_path_length(g)
+            if len(nx.nodes(g)) > 1:
+                p += nx.average_shortest_path_length(g)
         d /= i
         p /= i
         print("There are " + str(i) + " connected component subgraphs in this graph")
@@ -76,7 +60,7 @@ def printStats(graph,i):
     
     # plot degree distribution
     dd = nx.degree_histogram(graph)
-    pl.figure(i)
+    pl.figure(k)
     pl.subplot(212)
     plt.bar(np.arange(len(dd)), dd, width = 0.1)
     plt.axis([0,len(dd),0,max(dd)])
@@ -84,21 +68,3 @@ def printStats(graph,i):
     plt.xlabel("degree")
     plt.ylabel("number of nodes")
     return
-
-def analyseNetwork(i):
-    print("--------------------------")
-    print("Feeder" + str(i))
-    G = readNetworkData('feeder' + str(i) + '/line data.csv')
-    printStats(G,i)
-    drawNetwork(G,i)
-    plt.savefig("network_" + str(i) + ".png") # save as png
-    return
-
-analyseNetwork(13)
-analyseNetwork(34)
-analyseNetwork(37)
-analyseNetwork(123)
-
-plt.show()
-
-
