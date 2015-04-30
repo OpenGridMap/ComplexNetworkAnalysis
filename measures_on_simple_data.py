@@ -20,7 +20,6 @@ def readNetworkData(path):
         nodes.add(l[0])
         nodes.add(l[1])
         
-    print("Created graph with " + str(i-1) + " edges and " + str(len(nodes)) + " nodes.")
     return G
 
 
@@ -30,7 +29,7 @@ def analyseNetwork(i):
     G = readNetworkData('input/feeder' + str(i) + '/line data.csv')
     network_utils.printStats(G,i)
     network_utils.drawNetwork(G,i)
-    plt.savefig("output/network_" + str(i) + ".png") # save as png
+    plt.savefig("output/feeder_" + str(i) + ".png") # save as png
     return
 
 analyseNetwork(13)

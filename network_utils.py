@@ -28,6 +28,8 @@ def drawNetwork(graph,k):
     return
 
 def printStats(graph,k):
+    print(str(nx.number_of_nodes(graph)) + " nodes, " + str(nx.number_of_edges(graph)) + " edges")
+    print(str(nx.number_of_edges(graph)*2.0/nx.number_of_nodes(graph)) + " neighbors/node")
     
     if (nx.is_connected(graph)):
         d = nx.diameter(graph)
@@ -54,9 +56,13 @@ def printStats(graph,k):
 
     c = nx.average_clustering(graph)
     print("Average clustering : " + "%3.2f"%c)
-    
-    r = nx.degree_assortativity_coefficient(graph)
-    print("Degree assortativity : " + "%3.2f"%r)
+
+    try:
+        r = nx.degree_assortativity_coefficient(graph)
+        print("Degree assortativity : " + "%3.2f"%r)
+    except:
+        print("Impossible to compute degree assortativity")
+
     
     # plot degree distribution
     dd = nx.degree_histogram(graph)
