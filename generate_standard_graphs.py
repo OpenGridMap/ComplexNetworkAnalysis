@@ -35,7 +35,7 @@ def barabasi_albert_graph_modified(n, m, seed=None):
        random networks", Science 286, pp 509-512, 1999.
     """
 
-    residual = m - int(m)
+    residual = m/2 - int(m/2)
 
     if m < 1 or  m >=n-1:
         raise nx.NetworkXError(\
@@ -43,7 +43,7 @@ def barabasi_albert_graph_modified(n, m, seed=None):
     if seed is not None:
         random.seed(seed)
 
-    m_tmp = int(m)
+    m_tmp = int(m/2)
     if random.random() <= residual:
         m_tmp += 1
         
@@ -51,12 +51,17 @@ def barabasi_albert_graph_modified(n, m, seed=None):
     G=nx.empty_graph(m_tmp)
     G.name="barabasi_albert_graph(%s,%s)"%(n,m)
     # Target nodes for new edges
-    targets=list(range(m_tmp))
+    if m_tmp > 0:
+        targets = list(range(m_tmp))
+    else:
+        targets = []
     # List of existing nodes, with nodes repeated once for each adjacent edge
     repeated_nodes=[]
     # Start adding the other n-m nodes. The first node is m.
     source=m_tmp
     while source<n:
+        source += 1
+        G.add_node(source)
         # Add edges to m nodes from the source.
         G.add_edges_from(zip([source]*m_tmp,targets))
         # Add one node to the list for each new edge just created.
@@ -64,23 +69,28 @@ def barabasi_albert_graph_modified(n, m, seed=None):
         # And the new node "source" has m edges to add to the list.
         repeated_nodes.extend([source]*m_tmp)
 
-        m_tmp = int(m)
+        m_tmp = int(m/2)
         if random.random() <= residual:
             m_tmp += 1
         # Now choose m unique nodes from the existing nodes
         # Pick uniformly from repeated_nodes (preferential attachement)
-        targets = _random_subset(repeated_nodes, m_tmp)
-        source += 1
+        if m_tmp > 0:
+            if len(repeated_nodes) == 0 :
+                targets = list(range(m_tmp))
+            else: 
+                targets = _random_subset(repeated_nodes, m_tmp)
+        else:
+            targets = []
     return G
 
-def _random_subset(seq,m):
-    """ Return m unique elements from seq.
+def _random_subset(seq,u):
+    """ Return u unique elements from seq.
 
     This differs from random.sample which can return repeated
     elements if seq holds repeated elements.
     """
     targets=set()
-    while len(targets)<m:
+    while len(targets)<u:
         x=random.choice(seq)
         targets.add(x)
     return targets
@@ -102,7 +112,8 @@ def watts_strogatz_graph_modified(n, k, p, seed=None):
     Notes
     -----
     First create a ring over n nodes.  Then each node in the ring is
-    connected with its k nearest neighbors (k-1 neighbors if k is odd).
+    connected with its int(k) nearest neighbors (int(k-1) neighbors if k is odd).
+    Then connect each node with one more neighbor with probability k/2-int(k/2).
     Then shortcuts are created by replacing some edges as follows:
     for each edge u-v in the underlying "n-ring with k nearest neighbors"
     with probability p replace it with a new edge u-w with uniformly
@@ -128,6 +139,8 @@ def watts_strogatz_graph_modified(n, k, p, seed=None):
     G = nx.Graph()
     G.name="watts_strogatz_graph(%s,%s,%s)"%(n,k,p)
     nodes = list(range(n)) # nodes are labeled 0 to n-1
+    G.add_nodes_from(nodes)
+
     # connect each node to k/2 neighbors
     for j in range(1, int(k)//2 + 1):
         targets = nodes[j:] + nodes[0:j] # first j nodes are now last in list

@@ -29,28 +29,28 @@ analyseGraph(randomGraph, "random_37", 3736)
 randomGraph = nx.gnm_random_graph(123,118)
 analyseGraph(randomGraph, "random_123", 123118)
 
-scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(13,1.08)
+scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(13,1.85)
 analyseGraph(scaleFreeGraph, "scalefree_13", 1312)
 
-scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(34,1.03)
+scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(34,1.94)
 analyseGraph(scaleFreeGraph, "scalefree_34", 3433)
 
-scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(37,1.03)
+scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(37,1.95)
 analyseGraph(scaleFreeGraph, "scalefree_37", 3736)
 
-scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(123,1.04)
+scaleFreeGraph = mygraphs.barabasi_albert_graph_modified(123,1.92)
 analyseGraph(scaleFreeGraph, "scalefree_123", 123118)
 
-smallWorldGraph = mygraphs.watts_strogatz_graph_modified(13,1.08,0.3)
+smallWorldGraph = mygraphs.watts_strogatz_graph_modified(13,1.85,0.3)
 analyseGraph(smallWorldGraph, "smallWorld_13",1312)
 
-smallWorldGraph = mygraphs.watts_strogatz_graph_modified(34,1.03,0.3)
+smallWorldGraph = mygraphs.watts_strogatz_graph_modified(34,1.94,0.3)
 analyseGraph(smallWorldGraph, "smallWorld_34",3433)
 
-smallWorldGraph = mygraphs.watts_strogatz_graph_modified(37,1.03,0.3)
+smallWorldGraph = mygraphs.watts_strogatz_graph_modified(37,1.95,0.3)
 analyseGraph(smallWorldGraph, "smallWorld_37",3736)
 
-smallWorldGraph = mygraphs.watts_strogatz_graph_modified(123,1.04,0.3)
+smallWorldGraph = mygraphs.watts_strogatz_graph_modified(123,1.92,0.3)
 analyseGraph(smallWorldGraph, "smallWorld_123",123118)
 
 plt.show()

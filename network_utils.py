@@ -11,6 +11,7 @@ import pylab as pl
 def drawNetwork(graph,k):
     pl.figure(k)
     pl.subplot(211)
+    #pos = nx.shell_layout(graph) # positions for all nodes
     pos = nx.spring_layout(graph) # positions for all nodes
 
     # nodes
@@ -28,17 +29,28 @@ def drawNetwork(graph,k):
     return
 
 def printStats(graph,k):
-    print(str(nx.number_of_nodes(graph)) + " nodes, " + str(nx.number_of_edges(graph)) + " edges")
-    print(str(nx.number_of_edges(graph)*2.0/nx.number_of_nodes(graph)) + " neighbors/node")
+    nn = nx.number_of_edges(graph)*2.0/nx.number_of_nodes(graph)
+
+    stats = dict()
+    stats["Nodes"] = nx.number_of_nodes(graph)
+    stats["Edges"] = nx.number_of_edges(graph)
+    stats["Neighbors/node"] = "%3.2f"%nn
+        
+    c = nx.average_clustering(graph)
+    stats["Clustering coefficient"] = "%3.2f"%c
+
+    try:
+        r = nx.degree_assortativity_coefficient(graph)
+        stats["Degree assortativity"] = "%3.2f"%r
+    except:
+        print("Impossible to compute degree assortativity")
     
     if (nx.is_connected(graph)):
-        d = nx.diameter(graph)
-        print("Diameter : " + str(d))
+        stats['Diameter'] = nx.diameter(graph)
         p = nx.average_shortest_path_length(graph)
-        print("Characteristic path length : " + "%3.2f"%p)
+        stats["Characteristic path length"] = "%3.2f"%p
+        stats["Connected components"] = 1
     else:
-        print("Cannot compute diameter and characteristic path length: graph is not connected")
-
         d = 0.0
         p = 0.0
         i = 0
@@ -49,28 +61,24 @@ def printStats(graph,k):
                 p += nx.average_shortest_path_length(g)
         d /= i
         p /= i
-        print("There are " + str(i) + " connected component subgraphs in this graph")
-        print("Average diameter of connected components : " + "%3.2f"%d)
-        print("Average characteristic path length of connected components : " + "%3.2f"%p)
-        
+        stats["Connected components"] = i
+        stats["Diameter - avg on connected components"] = "%3.2f"%d
+        stats["Characteristic path length - avg on connected components"] = "%3.2f"%p 
 
-    c = nx.average_clustering(graph)
-    print("Average clustering : " + "%3.2f"%c)
 
-    try:
-        r = nx.degree_assortativity_coefficient(graph)
-        print("Degree assortativity : " + "%3.2f"%r)
-    except:
-        print("Impossible to compute degree assortativity")
+    for y in sorted(stats):
+        print (y,':',stats[y])
+        #print (stats[y])
 
     
     # plot degree distribution
     dd = nx.degree_histogram(graph)
-    pl.figure(k)
-    pl.subplot(212)
+    fig = pl.figure(k)
+    ax = pl.subplot(212)
     plt.bar(np.arange(len(dd)), dd, width = 0.1)
     plt.axis([0,len(dd),0,max(dd)])
     plt.title("Degree distribution")
     plt.xlabel("degree")
     plt.ylabel("number of nodes")
-    return
+    #plt.figtext(2, 6, stats, fontsize=15)
+    return stats
