@@ -22,7 +22,7 @@ def drawNetwork(graph,k):
                         width=3)
 
     # labels
-##    nx.draw_networkx_labels(graph,pos,font_size=20,font_family='sans-serif')
+    # nx.draw_networkx_labels(graph,pos,font_size=20,font_family='sans-serif')
 
     plt.axis('off')
     plt.draw() # display
@@ -64,15 +64,15 @@ def printStats(graph,k):
         stats["Connected components"] = i
         stats["Diameter - avg on connected components"] = "%3.2f"%d
         stats["Characteristic path length - avg on connected components"] = "%3.2f"%p 
-
+    
+    dd = nx.degree_histogram(graph)
+    stats["Max degree"] = len(dd) - 1
 
     for y in sorted(stats):
-        print (y,':',stats[y])
-        #print (stats[y])
-
-    
+        #print (y,':',stats[y])
+        print (stats[y])
+        
     # plot degree distribution
-    dd = nx.degree_histogram(graph)
     fig = pl.figure(k)
     ax = pl.subplot(212)
     plt.bar(np.arange(len(dd)), dd, width = 0.1)

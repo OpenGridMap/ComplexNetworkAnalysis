@@ -5,6 +5,7 @@ except:
 
 import networkx as nx
 import network_utils
+import numpy as np
 
 def readNetworkData(path):
     G = nx.Graph()
@@ -17,8 +18,6 @@ def readNetworkData(path):
             continue
         l = line.split(';')
         G.add_edge(l[0],l[1],length=int(l[2]))
-        nodes.add(l[0])
-        nodes.add(l[1])
         
     return G
 
@@ -28,15 +27,18 @@ def analyseNetwork(i):
     print("Feeder" + str(i))
     G = readNetworkData('input/feeder' + str(i) + '/line data.csv')
     network_utils.printStats(G,i)
+    mat = nx.degree_mixing_matrix(G)
+    print(np.array_str(mat))
     network_utils.drawNetwork(G,i)
     plt.savefig("output/feeder_" + str(i) + ".png") # save as png
-    return
-
-analyseNetwork(13)
-analyseNetwork(34)
-analyseNetwork(37)
-analyseNetwork(123)
+    return G
+"""
+G13 = analyseNetwork(13)
+G34 = analyseNetwork(34)
+G37 = analyseNetwork(37)
+G123 = analyseNetwork(123)
 
 plt.show()
+"""
 
 

@@ -1,5 +1,18 @@
 import networkx as nx
 import random
+import network_utils
+try:
+    import matplotlib.pyplot as plt
+except:
+    raise
+
+def analyseGraph(graph, graph_name, id_number):
+    print("--------------------------")
+    print(graph_name)
+    network_utils.printStats(graph,id_number)
+    network_utils.drawNetwork(graph, id_number)
+    plt.savefig("output/" + graph_name + "_" + str(id_number) + ".png") # save as png
+    return
 
 def my_barabasi_albert_graph(n, m, seed=None):
     """ m : int """
@@ -51,10 +64,10 @@ def barabasi_albert_graph_modified(n, m, seed=None):
     G=nx.empty_graph(m_tmp)
     G.name="barabasi_albert_graph(%s,%s)"%(n,m)
     # Target nodes for new edges
-    if m_tmp > 0:
-        targets = list(range(m_tmp))
-    else:
-        targets = []
+    if m_tmp < 1:
+        m_tmp = 1
+    targets = list(range(m_tmp))
+
     # List of existing nodes, with nodes repeated once for each adjacent edge
     repeated_nodes=[]
     # Start adding the other n-m nodes. The first node is m.
