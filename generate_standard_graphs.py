@@ -9,7 +9,7 @@ except:
 def analyseGraph(graph, graph_name, id_number):
     print("--------------------------")
     print(graph_name)
-    network_utils.printStats(graph,id_number)
+    network_utils.printStats(graph)
     network_utils.drawNetwork(graph, id_number)
     plt.savefig("output/" + graph_name + "_" + str(id_number) + ".png") # save as png
     return

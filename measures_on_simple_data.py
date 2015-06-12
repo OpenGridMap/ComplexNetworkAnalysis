@@ -26,19 +26,27 @@ def analyseNetwork(i):
     print("--------------------------")
     print("Feeder" + str(i))
     G = readNetworkData('input/feeder' + str(i) + '/line data.csv')
-    network_utils.printStats(G,i)
-    mat = nx.degree_mixing_matrix(G)
-    print(np.array_str(mat))
+    network_utils.printStats(G)
+    # mat = nx.degree_mixing_matrix(G)
+    # print(np.array_str(mat))
     network_utils.drawNetwork(G,i)
     plt.savefig("output/feeder_" + str(i) + ".png") # save as png
+    if not (nx.is_connected(G)):
+        k=1
+        for g in nx.connected_component_subgraphs(G):
+            network_utils.printStats(g)
+            network_utils.drawNetwork(g,i+100*k)
+            plt.savefig("output/feeder_subcomponent" + str(k) + "_" + str(i) + ".png") # save as png
+            k+=1
+    
     return G
 """
 G13 = analyseNetwork(13)
 G34 = analyseNetwork(34)
 G37 = analyseNetwork(37)
+"""
 G123 = analyseNetwork(123)
 
-plt.show()
-"""
+#plt.show()
 
 

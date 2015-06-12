@@ -25,16 +25,26 @@ def drawNetwork(graph,k):
     # nx.draw_networkx_labels(graph,pos,font_size=20,font_family='sans-serif')
 
     plt.axis('off')
+
+    # plot degree distribution
+    dd = nx.degree_histogram(graph)
+    fig = pl.figure(k)
+    ax = pl.subplot(212)
+    plt.bar(np.arange(len(dd)), dd, width = 0.1)
+    plt.axis([0,len(dd),0,max(dd)])
+    plt.title("Degree distribution")
+    plt.xlabel("degree")
+    plt.ylabel("number of nodes")
+    #plt.figtext(2, 6, stats, fontsize=15)
+    
     plt.draw() # display
     return
 
-def printStats(graph,k):
-    nn = nx.number_of_edges(graph)*2.0/nx.number_of_nodes(graph)
+def printStats(graph):
 
     stats = dict()
     stats["Nodes"] = nx.number_of_nodes(graph)
     stats["Edges"] = nx.number_of_edges(graph)
-    stats["Neighbors/node"] = "%3.2f"%nn
         
     c = nx.average_clustering(graph)
     stats["Clustering coefficient"] = "%3.2f"%c
@@ -42,6 +52,8 @@ def printStats(graph,k):
     try:
         r = nx.degree_assortativity_coefficient(graph)
         stats["Degree assortativity"] = "%3.2f"%r
+        r = get_assortativity_coeff(graph)
+        stats["Degree assortativity - own"] = "%3.2f"%r
     except:
         print("Impossible to compute degree assortativity")
     
@@ -59,26 +71,32 @@ def printStats(graph,k):
             d += nx.diameter(g)
             if len(nx.nodes(g)) > 1:
                 p += nx.average_shortest_path_length(g)
-        d /= i
         p /= i
         stats["Connected components"] = i
-        stats["Diameter - avg on connected components"] = "%3.2f"%d
-        stats["Characteristic path length - avg on connected components"] = "%3.2f"%p 
+        stats["Diameter - sum on cc"] = "%3.2f"%d
+        stats["Characteristic path length - avg on cc"] = "%3.2f"%p 
     
     dd = nx.degree_histogram(graph)
     stats["Max degree"] = len(dd) - 1
 
+    print("----------------------")
     for y in sorted(stats):
-        #print (y,':',stats[y])
-        print (stats[y])
-        
-    # plot degree distribution
-    fig = pl.figure(k)
-    ax = pl.subplot(212)
-    plt.bar(np.arange(len(dd)), dd, width = 0.1)
-    plt.axis([0,len(dd),0,max(dd)])
-    plt.title("Degree distribution")
-    plt.xlabel("degree")
-    plt.ylabel("number of nodes")
-    #plt.figtext(2, 6, stats, fontsize=15)
+        print (y,':',stats[y])
+        # print (stats[y])
+    print("----------------------")
+
     return stats
+
+def get_assortativity_coeff(G):
+    a = nx.degree_mixing_matrix(G)
+    # a: assortativity matrix
+    M = np.matrix(a)
+    
+    sum_rows = np.add.reduce(M,axis=0)
+    sum_lines = np.add.reduce(M,axis=1)
+    sum_rows_sq = sum_rows * np.transpose(sum_lines)
+    sum_sq = np.add.reduce(sum_rows_sq).item(0)
+        
+    d = (np.trace(M) - sum_sq) / (1 - sum_sq)
+    return d
+

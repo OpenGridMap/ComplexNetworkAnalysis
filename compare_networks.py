@@ -7,16 +7,26 @@ except:
     raise
 import numpy as np
 import networkx as nx
+import network_utils as utils
 
-F13 = data.analyseNetwork(13);
-dh = nx.degree_histogram(F13)
+def compare(n):
+    F = data.analyseNetwork(n);
+    dh = nx.degree_histogram(F)
+    mat = nx.degree_mixing_matrix(F)
+    print(np.array_str(mat))
+    coef = nx.degree_assortativity_coefficient(F)
+    
 
-G13 = transform.generate_degree_distribution(dh)
+    G = transform.generate_degree_distribution(dh)
+    G = transform.transform_graph_assortativity_coef(G,mat,coef)
+    # G = transform.transform_graph_assortativity(G,mat)
+    utils.printStats(G)
+    utils.drawNetwork(G,n*100)
+    
 
-"""PA13 = mygraphs.barabasi_albert_graph_modified(13,1.85)
-mygraphs.analyseGraph(PA13, "scalefree_13", 13121)"""
-mat = nx.degree_mixing_matrix(G13)
-print(np.array_str(mat))
-transform.metropolis_dynamics_assortativity(G13,nx.degree_mixing_matrix(F13),nx.degree_assortativity_coefficient(F13))
+compare(13)
+#compare(34)
+#compare(37)
+#compare(123)
 
 plt.show()
