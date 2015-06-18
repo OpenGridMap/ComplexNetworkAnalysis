@@ -7,6 +7,17 @@ import networkx as nx
 import numpy as np
 from pylab import hist
 import pylab as pl
+import csv
+
+def printComponent(C,path):
+    with open(path, 'w+') as csvfile:
+        writer = csv.writer(csvfile, delimiter=';', lineterminator='\n')
+        writer.writerow(["Node A","Node B","Length(ft.)","Config."])
+        length = nx.get_edge_attributes(C, 'length')
+        for edge in C.edges():
+            print(edge)
+            writer.writerow([edge[0],edge[1],length[edge],0])
+    return
 
 def drawNetwork(graph,k):
     pl.figure(k)
@@ -40,11 +51,11 @@ def drawNetwork(graph,k):
     plt.draw() # display
     return
 
-def printStats(graph):
-
+def getStats(graph):
     stats = dict()
     stats["Nodes"] = nx.number_of_nodes(graph)
     stats["Edges"] = nx.number_of_edges(graph)
+    stats["Neighbors/node"] = 2 * float(stats["Edges"])/ stats["Nodes"]
         
     c = nx.average_clustering(graph)
     stats["Clustering coefficient"] = "%3.2f"%c
@@ -53,7 +64,7 @@ def printStats(graph):
         r = nx.degree_assortativity_coefficient(graph)
         stats["Degree assortativity"] = "%3.2f"%r
         r = get_assortativity_coeff(graph)
-        stats["Degree assortativity - own"] = "%3.2f"%r
+        # stats["Degree assortativity - own"] = "%3.2f"%r
     except:
         print("Impossible to compute degree assortativity")
     
@@ -79,13 +90,26 @@ def printStats(graph):
     dd = nx.degree_histogram(graph)
     stats["Max degree"] = len(dd) - 1
 
+    return stats
+
+def printStatsV(graph):
+    stats = getStats(graph)
     print("----------------------")
     for y in sorted(stats):
-        print (y,':',stats[y])
-        # print (stats[y])
+        print (stats[y])
     print("----------------------")
 
     return stats
+
+def printStatsKV(graph):
+    stats = getStats(graph)
+    print("----------------------")
+    for y in sorted(stats):
+        print (y,':',stats[y])
+    print("----------------------")
+
+    return stats
+
 
 def get_assortativity_coeff(G):
     a = nx.degree_mixing_matrix(G)
