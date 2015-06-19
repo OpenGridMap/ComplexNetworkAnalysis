@@ -49,7 +49,16 @@ def drawNetwork(graph,k):
     #plt.figtext(2, 6, stats, fontsize=15)
     
     plt.draw() # display
+    
     return
+
+def analyseGraph(graph, graph_name, id_number):
+    print("--------------------------")
+    print(graph_name)
+    printStatsV(graph)
+    drawNetwork(graph, id_number)
+    plt.savefig("output/" + graph_name + "_" + str(id_number) + ".png") # save as png
+    return graph
 
 def getStats(graph):
     stats = dict()

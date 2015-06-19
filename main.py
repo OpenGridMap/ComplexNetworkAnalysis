@@ -8,34 +8,63 @@ try:
 except:
     raise
 
+
   
 """
 G13 = msd.readFeederData(13)
 G34 = msd.readFeederData(34)
 G37 = msd.readFeederData(37)
 G123 = msd.readFeederData(123)
-
-utils.printStatsV(msd.readFeederData(124))
-utils.printStatsV(msd.readFeederData(125))
-utils.printStatsV(msd.readFeederData(126))
-utils.printStatsV(msd.readFeederData(127))
-utils.printStatsV(msd.readFeederData(128))
 """
 
+def drawAndSave():
+    utils.analyseGraph(msd.readFeederData(13), "feeder13", 13)
+    utils.analyseGraph(msd.readFeederData(34), "feeder34", 34)
+    utils.analyseGraph(msd.readFeederData(37), "feeder37", 37)
+    utils.analyseGraph(msd.readFeederData(123), "feeder123", 123)
+    
+    
+    utils.analyseGraph(transform.synthetic(13), "synthetic13", 130)
+    utils.analyseGraph(transform.synthetic(34), "synthetic34", 340)
+    utils.analyseGraph(transform.synthetic(37), "synthetic37", 350)
+    utils.analyseGraph(transform.synthetic(123), "synthetic123", 1230)
+    
+    ### subcomponents of feeder 123
+    
+    utils.analyseGraph(msd.readFeederData(124), "feeder124", 124)
+    utils.analyseGraph(msd.readFeederData(125), "feeder125", 125)
+    utils.analyseGraph(msd.readFeederData(126), "feeder126", 126)
+    utils.analyseGraph(msd.readFeederData(127), "feeder127", 127)
+    utils.analyseGraph(msd.readFeederData(128), "feeder128", 128)
+    
+    utils.analyseGraph(transform.synthetic(124, True), "synthetic_sub124", 12400)
+    utils.analyseGraph(transform.synthetic(125, True), "synthetic_sub125", 12500)
+    utils.analyseGraph(transform.synthetic(126, True), "synthetic_sub126", 12600)
+    utils.analyseGraph(transform.synthetic(127, True), "synthetic_sub127", 12700)
+    utils.analyseGraph(transform.synthetic(128, True), "synthetic_sub128", 12800)
+    
+drawAndSave()
 
-utils.printStatsV(transform.synthetic(13))
-utils.printStatsV(transform.synthetic(34))
-utils.printStatsV(transform.synthetic(37))
-utils.printStatsV(transform.synthetic(123))
+def print():
+    utils.printStatsV(transform.synthetic(13))
+    utils.printStatsV(transform.synthetic(34))
+    utils.printStatsV(transform.synthetic(37))
+    utils.printStatsV(transform.synthetic(123))
+    
+    ### subcomponents of feeder 123
+    
+    utils.printStatsV(msd.readFeederData(124))
+    utils.printStatsV(msd.readFeederData(125))
+    utils.printStatsV(msd.readFeederData(126))
+    utils.printStatsV(msd.readFeederData(127))
+    utils.printStatsV(msd.readFeederData(128))
+    
+    utils.printStatsV(transform.synthetic(124, True))
+    utils.printStatsV(transform.synthetic(125, True))
+    utils.printStatsV(transform.synthetic(126, True))
+    utils.printStatsV(transform.synthetic(127, True))
+    utils.printStatsV(transform.synthetic(128, True))
 
-### subcomponents of feeder 123
-"""
-utils.printStatsV(transform.synthetic(124, True))
-utils.printStatsV(transform.synthetic(125, True))
-utils.printStatsV(transform.synthetic(126, True))
-utils.printStatsV(transform.synthetic(127, True))
-utils.printStatsV(transform.synthetic(128, True))
-"""
 
 #plt.show()
 

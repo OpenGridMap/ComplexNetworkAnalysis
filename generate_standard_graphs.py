@@ -6,14 +6,6 @@ try:
 except:
     raise
 
-def analyseGraph(graph, graph_name, id_number):
-    print("--------------------------")
-    print(graph_name)
-    network_utils.printStatsV(graph)
-    network_utils.drawNetwork(graph, id_number)
-    plt.savefig("output/" + graph_name + "_" + str(id_number) + ".png") # save as png
-    return graph
-
 def my_barabasi_albert_graph(n, m, seed=None):
     """ m : int """
     return nx.barabasi_albert_graph(n, m, seed)

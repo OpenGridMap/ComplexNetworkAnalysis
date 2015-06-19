@@ -19,9 +19,6 @@ def synthetic(n, connectedDegree = True, keepConnected = True):
     G = generate_degree_distribution(dh, connectedDegree)
     G = transform_graph_assortativity_coef(G,mat,coef, keepConnected)
 
-    utils.drawNetwork(G,n*100)
-    plt.savefig("output/" + "synthetic" + "_" + str(n) + ".png") # save as png
-
     return G
 
 def havel_hakimi_custom_graph(deg_sequence):
