@@ -3,6 +3,7 @@ import numpy as np
 import networkx as nx
 import network_utils as utils
 import measures_on_simple_data as data
+import infer_parameters as infer
 from math import ceil
 try:
     import matplotlib.pyplot as plt
@@ -15,8 +16,38 @@ def synthetic(n, connectedDegree = True, keepConnected = True):
     mat = nx.degree_mixing_matrix(F)
     print(np.array_str(mat))
     coef = nx.degree_assortativity_coefficient(F)
+    
+    dd = utils.degreehisto_to_degreeseq(dh)
+    if connectedDegree:
+        G = havel_hakimi_custom_graph(dd)
+    else:
+        G = nx.random_degree_sequence_graph(dd)
+    
+    print("Degree distribution : " + str(dh))
+    print("Nb cc : " + str(nx.number_connected_components(G)))
+    
+    dh2 = nx.degree_histogram(G)
+    print("Result Degree distribution : " + str(dh2))
+    G = transform_graph_assortativity_coef(G,mat,coef, keepConnected)
 
-    G = generate_degree_distribution(dh, connectedDegree)
+    return G
+
+def syntheticInferred(n, connectedDegree = True, keepConnected = True):
+    dd = infer.infer_degree_sequence(n)
+    mat = infer.infer_assortativity_matrix(n)
+    print(np.array_str(mat))
+    coef = infer.infer_assortativity_coeff(n)
+
+    if connectedDegree:
+        G = havel_hakimi_custom_graph(dd)
+    else:
+        G = nx.random_degree_sequence_graph(dd)
+    
+    print("Degree distribution : " + str(dd))
+    print("Nb cc : " + str(nx.number_connected_components(G)))
+    
+    dh2 = nx.degree_histogram(G)
+    print("Result Degree distribution : " + str(dh2))
     G = transform_graph_assortativity_coef(G,mat,coef, keepConnected)
 
     return G
@@ -59,7 +90,8 @@ def havel_hakimi_custom_graph(deg_sequence):
        Algorithms for Constructing Graphs and Digraphs with Given Valences
        and Factors  Discrete Mathematics, 6(1), pp. 79-88 (1973) 
     """
-    if not nx.is_valid_degree_sequence(deg_sequence):
+
+    if not (nx.is_valid_degree_sequence(deg_sequence) or nx.is_graphical(deg_sequence) or nx.is_valid_degree_sequence_erdos_gallai(deg_sequence)):
         raise nx.NetworkXError('Invalid degree sequence')
 
     p = len(deg_sequence)
@@ -114,22 +146,6 @@ def havel_hakimi_custom_graph(deg_sequence):
     G.name="havel_hakimi_graph %d nodes %d edges"%(G.order(),G.size())
     return G
 
-
-def generate_degree_distribution(degree_histogram, connectedDegree = True):
-    dd = []
-    for x in range(0,len(degree_histogram)):
-        dd += [x]*degree_histogram[x]
-     
-    if connectedDegree:
-        G = havel_hakimi_custom_graph(dd)
-    else:
-        G = nx.random_degree_sequence_graph(dd)
-    print("Degree distribution : " + str(degree_histogram))
-    print("Nb cc : " + str(nx.number_connected_components(G)))
-    
-    dh = nx.degree_histogram(G)
-    print("Result Degree distribution : " + str(dh))
-    return G
 
 def test_assortativity_coeff():
     tab = [[0.258,0.016,0.035,0.013],[0.012,0.157,0.058,0.019],[0.013,0.023,0.306,0.035],[0.005,0.007,0.024,0.016]]
@@ -242,7 +258,7 @@ def transform_graph_assortativity_coef(G,A, coeff_d, limitateConnComp = True):
                 number_cc_prev = nb_cc
             else:
                 # undo changes from previous window, decrease window
-                print("undo " + str(window) +" " + str(countw))
+                #print("undo " + str(window) +" " + str(countw))
                 while swapped:
                     (u,v,x,y)=swapped.pop()
                     G.add_edge(u,v)

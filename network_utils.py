@@ -9,6 +9,12 @@ from pylab import hist
 import pylab as pl
 import csv
 
+def degreehisto_to_degreeseq(degree_histogram):
+    dd = []
+    for x in range(0,len(degree_histogram)):
+        dd += [x]*degree_histogram[x]
+    return dd
+
 def printComponent(C,path):
     with open(path, 'w+') as csvfile:
         writer = csv.writer(csvfile, delimiter=';', lineterminator='\n')

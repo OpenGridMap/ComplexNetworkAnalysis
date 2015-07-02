@@ -17,12 +17,12 @@ G37 = msd.readFeederData(37)
 G123 = msd.readFeederData(123)
 """
 
+# print stats, draw and save figures
 def drawAndSave():
     utils.analyseGraph(msd.readFeederData(13), "feeder13", 13)
     utils.analyseGraph(msd.readFeederData(34), "feeder34", 34)
     utils.analyseGraph(msd.readFeederData(37), "feeder37", 37)
     utils.analyseGraph(msd.readFeederData(123), "feeder123", 123)
-    
     
     utils.analyseGraph(transform.synthetic(13), "synthetic13", 130)
     utils.analyseGraph(transform.synthetic(34), "synthetic34", 340)
@@ -42,17 +42,19 @@ def drawAndSave():
     utils.analyseGraph(transform.synthetic(126, True), "synthetic_sub126", 12600)
     utils.analyseGraph(transform.synthetic(127, True), "synthetic_sub127", 12700)
     utils.analyseGraph(transform.synthetic(128, True), "synthetic_sub128", 12800)
-    
-drawAndSave()
 
-def print():
+
+def inferParameters(n):    
+    utils.analyseGraph(transform.syntheticInferred(n, True), "synthetic_" + str(n), n * 1000)
+
+# print stats of all real feeders and synthetic networks
+def printStats():
     utils.printStatsV(transform.synthetic(13))
     utils.printStatsV(transform.synthetic(34))
     utils.printStatsV(transform.synthetic(37))
     utils.printStatsV(transform.synthetic(123))
     
     ### subcomponents of feeder 123
-    
     utils.printStatsV(msd.readFeederData(124))
     utils.printStatsV(msd.readFeederData(125))
     utils.printStatsV(msd.readFeederData(126))
@@ -66,7 +68,6 @@ def print():
     utils.printStatsV(transform.synthetic(128, True))
 
 
-#plt.show()
 
 def teststat(k):
     nb_cc = []
@@ -82,3 +83,7 @@ def teststat(k):
     return
 
 # teststat(124)
+inferParameters(32)
+
+#drawAndSave()
+#plt.show()
