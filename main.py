@@ -29,8 +29,7 @@ def drawAndSave():
     utils.analyseGraph(transform.synthetic(37), "synthetic37", 350)
     utils.analyseGraph(transform.synthetic(123), "synthetic123", 1230)
     
-    ### subcomponents of feeder 123
-    
+    ### subcomponents of feeder 123 
     utils.analyseGraph(msd.readFeederData(124), "feeder124", 124)
     utils.analyseGraph(msd.readFeederData(125), "feeder125", 125)
     utils.analyseGraph(msd.readFeederData(126), "feeder126", 126)
@@ -42,7 +41,6 @@ def drawAndSave():
     utils.analyseGraph(transform.synthetic(126, True), "synthetic_sub126", 12600)
     utils.analyseGraph(transform.synthetic(127, True), "synthetic_sub127", 12700)
     utils.analyseGraph(transform.synthetic(128, True), "synthetic_sub128", 12800)
-
 
 def inferParameters(n):    
     utils.analyseGraph(transform.syntheticInferred(n, True), "synthetic_" + str(n), n * 1000)
@@ -66,8 +64,6 @@ def printStats():
     utils.printStatsV(transform.synthetic(126, True))
     utils.printStatsV(transform.synthetic(127, True))
     utils.printStatsV(transform.synthetic(128, True))
-
-
 
 def teststat(k):
     nb_cc = []

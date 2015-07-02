@@ -8,7 +8,7 @@ from network_utils import degreehisto_to_degreeseq
 
 # list of example feeders
 examples_list = [13, 34, 37, 123, 124, 125, 126, 127, 128]
-examples_nbnodes_list = [13, 34, 37, 123, 32, 32, 19, 16, 16]
+examples_nbnodes_list = [13, 34, 37, 123, 36, 36, 19, 16, 16]
 
 
 def infer_degree_sequence(n):
@@ -329,7 +329,4 @@ def infer_assortativity_coeff(n):
 	w_lower /= s
 	w_upper /= s
 	my_coeff = w_lower*C_lower + w_upper*C_upper
-
 	return my_coeff
-
-
