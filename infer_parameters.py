@@ -22,13 +22,14 @@ def infer_degree_sequence(n):
 	for e in nblist:
 		if e == n:
 			histo = np.asarray(np.transpose(S[:, i]))[0]
-			print(histo)
 			return histo
 		i += 1
 		
 	# Elif n greater than max or lower than min of all known examples, return empty
 	if n > max(nblist) or n < min(nblist):
-		print("Cannot infer degree sequence : " + str(n) + " not in range of known examples.")
+		print("Cannot infer degree sequence : " + str(n) 
+			+ " not in range of known examples. Number of nodes must be between " 
+			+ min(nblist)+ " and " + max(nblist))
 		return []
 	
 	# Else, find two degree sequences examples with nearest number of nodes
@@ -51,10 +52,6 @@ def infer_degree_sequence(n):
 	n_upper = n_upper.item(0)
 	seq_lower = degreehisto_to_degreeseq(h_lower)
 	seq_upper = degreehisto_to_degreeseq(h_upper)
-	print(n_lower)
-	print(seq_lower)
-	print(n_upper)
-	print(seq_upper)
 	
 	# prepare my_seq
 	my_seq = seq_lower
@@ -81,23 +78,25 @@ def infer_degree_sequence(n):
 	double_edges += double_edges%2
 
 	# loop until reaching desired number of edges
+	# add degrees, keeping the sequence graphical
 	while sum(my_seq) < double_edges:
-		# add degrees, keeping the sequence graphical
+        # add a degree to a low degree node
 		i = 0
 		while my_seq[i] >= seq_upper[i]:
 			i += 1
 		my_seq[i] += 1
+		# add a degree to a high degree node
 		j = -1
 		while my_seq[j] >= seq_upper[j]:
 			j -= 1
 		my_seq[j] += 1
 		my_seq.sort()
 		# my_seq should be graphical at every loop
-
+		"""
 	print(my_seq)
 	print(nx.is_graphical(my_seq))
 	print(nx.is_valid_degree_sequence(my_seq))
-	print(aux.is_valid_degree_sequence_erdos_gallai(my_seq))
+	print(aux.is_valid_degree_sequence_erdos_gallai(my_seq))"""
 	return my_seq
 
 def infer_degree_sequence_random(n):
@@ -117,7 +116,9 @@ def infer_degree_sequence_random(n):
 		
 	# Elif n greater than max or lower than min of all known examples, return empty
 	if n > max(nblist) or n < min(nblist):
-		print("Cannot infer degree sequence : " + str(n) + " not in range of known examples.")
+		print("Cannot infer degree sequence : " + str(n) 
+			+ " not in range of known examples. Number of nodes must be between " 
+			+ min(nblist)+ " and " + max(nblist))
 		return []
 	
 	# Else, find two degree sequences examples with nearest number of nodes
@@ -140,10 +141,6 @@ def infer_degree_sequence_random(n):
 	n_upper = n_upper.item(0)
 	seq_lower = degreehisto_to_degreeseq(h_lower)
 	seq_upper = degreehisto_to_degreeseq(h_upper)
-	print(n_lower)
-	print(seq_lower)
-	print(n_upper)
-	print(seq_upper)
 	
 	# prepare my_seq
 	my_seq = seq_lower
@@ -170,34 +167,33 @@ def infer_degree_sequence_random(n):
 	double_edges += double_edges%2
 	
 	# loop until reaching desired number of edges
+	# add degrees, keeping the sequence graphical
 	while sum(my_seq) < double_edges:
-		# add degrees, keeping the sequence graphical
+        # add a degree to a random node
 		if 0 in my_seq:
 			my_seq[0] = 1
+			i1 = 0
 		else:
 			k = choice(seq_upper)
 			while (k-1) not in my_seq:
 				k = choice(seq_upper)
-			i = 0
-			while my_seq[i] != k-1:
-				i += 1
-			my_seq[i] = k
-		# add an other degree, to keep the sequence graphical
+			i1 = my_seq.index(k-1) 
+			my_seq[i1] = k
+		# add a degree to a distinct node, to keep the sequence graphical
 		k = choice(seq_upper)
-		while (k-1) not in my_seq:
+		i2 = -1
+		while (k-1) not in my_seq or i2 == i1:
 			k = choice(seq_upper)
-		i = 0
-		while my_seq[i] != k-1:
-			i += 1
-		my_seq[i] = k
-		
+			if (k-1) in my_seq:
+				i2 = my_seq.index(k-1)
+		my_seq[i2] = k
 		my_seq.sort()
 		# my_seq should be graphical at every loop
-
+		"""
 	print(my_seq)
 	print(nx.is_graphical(my_seq))
 	print(nx.is_valid_degree_sequence(my_seq))
-	print(aux.is_valid_degree_sequence_erdos_gallai(my_seq))
+	print(aux.is_valid_degree_sequence_erdos_gallai(my_seq))"""
 	return my_seq
 
 		
@@ -261,7 +257,9 @@ def infer_assortativity_matrix(n):
 		
 	# Elif n greater than max or lower than min of all known examples, return empty
 	if n > max(examples_nbnodes_list) or n < min(examples_nbnodes_list):
-		print("Cannot infer assortativity matrix : " + str(n) + " not in range of known examples.")
+		print("Cannot infer assortativity matrix : " + str(n) 
+			+ " not in range of known examples. Number of nodes must be between " 
+			+ min(examples_nbnodes_list)+ " and " + max(examples_nbnodes_list))
 		return []
 	
 	# Else, find two examples with nearest number of nodes
@@ -288,7 +286,6 @@ def infer_assortativity_matrix(n):
 	ml = np.multiply(mat_lower,w_lower)
 	mu = np.multiply(mat_upper,w_upper)
 	my_mat = ml + mu
-
 	return my_mat
 
 def infer_assortativity_coeff(n):
@@ -304,7 +301,9 @@ def infer_assortativity_coeff(n):
 		
 	# Elif n greater than max or lower than min of all known examples, return empty
 	if n > max(examples_nbnodes_list) or n < min(examples_nbnodes_list):
-		print("Cannot infer assortativity coeff : " + str(n) + " not in range of known examples.")
+		print("Cannot infer assortativity coeff : " + str(n) 
+			+ " not in range of known examples. Number of nodes must be between " 
+			+ min(examples_nbnodes_list)+ " and " + max(examples_nbnodes_list))
 		return []
 	
 	# Else, find two examples with nearest number of nodes

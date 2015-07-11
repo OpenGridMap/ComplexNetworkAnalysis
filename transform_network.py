@@ -1,5 +1,9 @@
 import random
-import numpy as np
+try:
+    import numpy as np
+except ImportError:
+    raise ImportError('code requires ',
+                          'NumPy: http://scipy.org/')
 import networkx as nx
 import network_utils as utils
 import measures_on_simple_data as data
@@ -14,8 +18,6 @@ def synthetic(n, connectedDegree = True, keepConnected = True):
     F = data.readFeederData(n);
     dh = nx.degree_histogram(F)
     mat = nx.degree_mixing_matrix(F)
-    print(np.array_str(mat))
-    coef = nx.degree_assortativity_coefficient(F)
     
     dd = utils.degreehisto_to_degreeseq(dh)
     if connectedDegree:
@@ -23,32 +25,30 @@ def synthetic(n, connectedDegree = True, keepConnected = True):
     else:
         G = nx.random_degree_sequence_graph(dd)
     
-    print("Degree distribution : " + str(dh))
+    """print("Degree distribution : " + str(dh))
     print("Nb cc : " + str(nx.number_connected_components(G)))
     
     dh2 = nx.degree_histogram(G)
-    print("Result Degree distribution : " + str(dh2))
-    G = transform_graph_assortativity_coef(G,mat,coef, keepConnected)
+    print("Result Degree distribution : " + str(dh2))"""
+    G = transform_graph_assortativity_coef(G,mat,keepConnected)
 
     return G
 
 def syntheticInferred(n, connectedDegree = True, keepConnected = True):
     dd = infer.infer_degree_sequence(n)
     mat = infer.infer_assortativity_matrix(n)
-    print(np.array_str(mat))
-    coef = infer.infer_assortativity_coeff(n)
 
     if connectedDegree:
         G = havel_hakimi_custom_graph(dd)
     else:
         G = nx.random_degree_sequence_graph(dd)
-    
+    """
     print("Degree distribution : " + str(dd))
     print("Nb cc : " + str(nx.number_connected_components(G)))
     
     dh2 = nx.degree_histogram(G)
-    print("Result Degree distribution : " + str(dh2))
-    G = transform_graph_assortativity_coef(G,mat,coef, keepConnected)
+    print("Result Degree distribution : " + str(dh2))"""
+    G = transform_graph_assortativity_coef(G,mat,keepConnected)
 
     return G
 
@@ -146,31 +146,36 @@ def havel_hakimi_custom_graph(deg_sequence):
     G.name="havel_hakimi_graph %d nodes %d edges"%(G.order(),G.size())
     return G
 
-
 def test_assortativity_coeff():
     tab = [[0.258,0.016,0.035,0.013],[0.012,0.157,0.058,0.019],[0.013,0.023,0.306,0.035],[0.005,0.007,0.024,0.016]]
-    d = get_assortativity_coeff(tab)
     # should be 0.621
+    tab = np.matrix([[1,0,0,0],[0,1,0,0],[0,0,1,0],[0,0,0,1]])/4
+    tab = np.matrix([[0,0,0,1],[0,0,1,0],[0,1,0,0],[1,0,0,0]])/4
+
+    d = numeric_ac(tab)
     print(str(d))
 
-def get_assortativity_coeff(a):
-    # a: assortativity matrix
-    M = np.matrix(a)
-    
-    sum_rows = np.add.reduce(M,axis=0)
-    sum_lines = np.add.reduce(M,axis=1)
-    sum_rows_sq = sum_rows * np.transpose(sum_lines)
-    sum_sq = np.add.reduce(sum_rows_sq).item(0)
-        
-    d = (np.trace(M) - sum_sq) / (1 - sum_sq)
-    return d
+def numeric_ac(mat):
+    M = np.matrix(mat)
+    # M is a numpy matrix or array
+    # numeric assortativity coefficient, pearsonr
+    if M.sum() != 1.0:
+        M=M/float(M.sum())
+    nx,ny=M.shape # nx=ny
+    x=np.arange(nx)
+    y=np.arange(ny)
+    a=np.ravel(M.sum(axis=0))
+    b=np.ravel(M.sum(axis=1))
+    vara=(a*x**2).sum()-((a*x).sum())**2
+    varb=(b*x**2).sum()-((b*x).sum())**2
+    xy=np.outer(x,y)
+    ab=np.outer(a,b)
+    return np.multiply(xy,(M-ab)).sum()/np.sqrt(vara*varb)
 
-def transform_graph_assortativity_coef(G,A, coeff_d, limitateConnComp = True):
-# def transform_graph_assortativity(G,A):
+def transform_graph_assortativity_coef(G,A,limitateConnComp = True):
     ### G: graph to rewire for desired assortativity coeff (at constant degree distribution)
     ### A: desired assortativity matrix
-    
-    # coeff_d = get_assortativity_coeff(A)
+    coeff_d = numeric_ac(A)
     
     ### resize matrix of desired assortativity with zeros if actual is bigger
     assortativity_actual = nx.degree_mixing_matrix(G)
@@ -179,18 +184,16 @@ def transform_graph_assortativity_coef(G,A, coeff_d, limitateConnComp = True):
         for j in range(len(A)):
             A[j] += [0]*epsilon
             for k in range(epsilon):
-                A.append([0]*(len(A)+epsilon))
-    # print(np.array_str(A))
-    
+                A.append([0]*(len(A)+epsilon))    
     k = 0
     print("Desired assortativity coefficient : " + str(coeff_d))
-    # print("Actual before : " + str(get_assortativity_coeff(nx.degree_mixing_matrix(G))))
     print("Actual before : " + str(nx.degree_assortativity_coefficient(G)))
     nb_identical = 0
     prev_delta = 0.2
     delta = 0.2
     nb_swaps = 0
     window = 1
+    nb_undo_window = 0
     number_cc_prev = nx.number_connected_components(G)
     
     while abs(delta) > 0.01 and nb_identical < 400:
@@ -200,7 +203,7 @@ def transform_graph_assortativity_coef(G,A, coeff_d, limitateConnComp = True):
         save_delta = delta
         save_prev_delta = prev_delta
         save_nb_swaps = nb_swaps
-        while countw < window and abs(delta) > 0.01 and nb_identical < 400: 
+        while countw < window and delta > 0.01 and nb_identical < 400: 
             nodes = nx.nodes(G)
           
             ### choose two random edges
@@ -223,7 +226,7 @@ def transform_graph_assortativity_coef(G,A, coeff_d, limitateConnComp = True):
             if (u1 == u2 or v1 == v2 or u1 == v2 or u2 == v1):
                 continue
             if (G.has_edge(u1,u2) or G.has_edge(v1,v2)):
-                 continue
+                continue
             
             ### compute rewiring probability
             denom = A[j1][k1]*A[j2][k2]
@@ -243,18 +246,18 @@ def transform_graph_assortativity_coef(G,A, coeff_d, limitateConnComp = True):
                 
             # actual_coeff = get_assortativity_coeff(nx.degree_mixing_matrix(G))
             actual_coeff = nx.degree_assortativity_coefficient(G)
-            delta = actual_coeff - coeff_d
+            delta = abs(actual_coeff - coeff_d)
             if abs(prev_delta - delta) < 0.001:
                 nb_identical += 1
             else:
                 nb_identical = 0
             prev_delta = delta
             k+= 1
-        
-        if limitateConnComp:
+
+        if limitateConnComp or save_delta < delta:
             nb_cc = nx.number_connected_components(G)
-            if nb_cc <= number_cc_prev:
-                window += 1
+            if nb_cc <= number_cc_prev and save_delta >= delta:
+                #window += 1
                 number_cc_prev = nb_cc
             else:
                 # undo changes from previous window, decrease window
@@ -266,15 +269,19 @@ def transform_graph_assortativity_coef(G,A, coeff_d, limitateConnComp = True):
                     G.remove_edge(u,x)
                     G.remove_edge(v,y)
                     nb_swaps -= 1
-                window = int(ceil(float(window)/2))
+                window = max(int(ceil(float(window)/2)),1)
                 
                 # restore values from the beginning of the past window
                 nb_identical = save_nb_identical
                 prev_delta = save_prev_delta
                 delta = save_delta
                 nb_swaps = save_nb_swaps
+                
+                nb_undo_window += 1
+            if nb_undo_window >= 1000:
+                break
         
-    print("Actual after : " + str(actual_coeff))
-    print(str(k) + " turn(s), " + str(nb_swaps) + " swap(s)")
+    print("Actual after : " + str(nx.degree_assortativity_coefficient(G)))
+    print(str(k) + " turn(s), " + str(nb_swaps) + " swap(s), " + str(nb_undo_window) + " undo_windows")
     
     return G

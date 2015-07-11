@@ -8,26 +8,12 @@ try:
 except:
     raise
 
-
-  
-"""
-G13 = msd.readFeederData(13)
-G34 = msd.readFeederData(34)
-G37 = msd.readFeederData(37)
-G123 = msd.readFeederData(123)
-"""
-
 # print stats, draw and save figures
-def drawAndSave():
+def drawAndSaveReal():
     utils.analyseGraph(msd.readFeederData(13), "feeder13", 13)
     utils.analyseGraph(msd.readFeederData(34), "feeder34", 34)
     utils.analyseGraph(msd.readFeederData(37), "feeder37", 37)
     utils.analyseGraph(msd.readFeederData(123), "feeder123", 123)
-    
-    utils.analyseGraph(transform.synthetic(13), "synthetic13", 130)
-    utils.analyseGraph(transform.synthetic(34), "synthetic34", 340)
-    utils.analyseGraph(transform.synthetic(37), "synthetic37", 350)
-    utils.analyseGraph(transform.synthetic(123), "synthetic123", 1230)
     
     ### subcomponents of feeder 123 
     utils.analyseGraph(msd.readFeederData(124), "feeder124", 124)
@@ -36,6 +22,14 @@ def drawAndSave():
     utils.analyseGraph(msd.readFeederData(127), "feeder127", 127)
     utils.analyseGraph(msd.readFeederData(128), "feeder128", 128)
     
+# print stats, draw and save figures
+def drawAndSaveSynthetic():    
+    utils.analyseGraph(transform.synthetic(13), "synthetic13", 130)
+    utils.analyseGraph(transform.synthetic(34), "synthetic34", 340)
+    utils.analyseGraph(transform.synthetic(37), "synthetic37", 350)
+    utils.analyseGraph(transform.synthetic(123), "synthetic123", 1230)
+    
+    ### subcomponents of feeder 123     
     utils.analyseGraph(transform.synthetic(124, True), "synthetic_sub124", 12400)
     utils.analyseGraph(transform.synthetic(125, True), "synthetic_sub125", 12500)
     utils.analyseGraph(transform.synthetic(126, True), "synthetic_sub126", 12600)
@@ -79,7 +73,9 @@ def teststat(k):
     return
 
 # teststat(124)
-inferParameters(32)
+#[13, 34, 37, 123, 36, 36, 19, 16, 16]
+#inferParameters(35)
 
-#drawAndSave()
+#drawAndSaveReal()
+drawAndSaveSynthetic()
 #plt.show()
